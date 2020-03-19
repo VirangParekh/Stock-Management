@@ -8,6 +8,7 @@ class RawMaterial(models.Model):
         ('kg','KiloGrams'),
         ('ltr','Litres'),
     )
+    date=models.DateField(verbose_name='raw-material_date', auto_now=True)
     raw_cat=models.CharField(max_length=350)
     raw_sub_cat=models.CharField(max_length=300)
     quantity=models.FloatField(verbose_name='raw_material_quantity')
@@ -20,15 +21,16 @@ class ProductionStage(models.Model):
         ('ink','ink'),
         ('paint','paint'),
     )
+    date_prod=models.DateField(verbose_name='production_date', auto_now=True)
     raw_material=models.ForeignKey(RawMaterial, on_delete=models.CASCADE)
     name=models.CharField(max_length=350, verbose_name='product name')
     quantity_prod=models.FloatField(verbose_name='ProdutionQuantity')
 
 class Dispatch(models.Model):
+    date_dispatch=models.DateField(verbose_name='date_of_dispatch')
     product=models.ForeignKey(ProductionStage,on_delete=models.CASCADE)
     bill_no=models.IntegerField(verbose_name='bill_number')
-    dispatch_status=models.BooleanField(default=True)
-    
+    dispatch_status=models.BooleanField(default=True) 
 
 
 
