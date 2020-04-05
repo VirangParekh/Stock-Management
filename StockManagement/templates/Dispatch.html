@@ -1,0 +1,28 @@
+<h1>
+    Hi there
+</h1>
+
+<p>
+{% for items in all_products %}
+    <ul>
+        <li>
+            {{ items }}
+        </li>
+    </ul>
+{% endfor %}
+</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ create_form.as_p }}
+    <input type="submit" value="AddNew">
+</form>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ update_form.as_p }}
+    
+    <input type="submit" value="Update">
+</form>
