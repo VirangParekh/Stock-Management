@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from .models import RawMaterial, ProductionStage, Dispatch
-#from django.views.generic import FormView, CreateView, UpdateView, DeleteView, View
-from .forms import RawMaterialForm, ProductionStageForm, DispatchForm, LoginForm
+from .forms import RawMaterialForm, ProductionStageForm, DispatchForm #LoginForm
 import templates
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login
@@ -92,7 +91,7 @@ def LoginView(request):
         if form.is_valid():
             user=form.get_user()
             login(request, user)
-            redirect('/view_raw_material')
+            return redirect('/view_raw_material')
     else:
         form=AuthenticationForm()
 

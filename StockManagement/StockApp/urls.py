@@ -12,5 +12,6 @@ urlpatterns = [
     path('view_dispatch', views.view_dispatch, name='view_dispatch'),
     path('create_dispatch', views.create_dispatch, name='create_dispatch'),
     path('update_dispatch/<str:name>', views.update_dispatch, name='update_dispatch'),
+    path('login',views.LoginView,name='login')
 
 ]
