@@ -30,11 +30,15 @@ def create_raw_material(request):
 
 def update_raw_material(request, name):
     raw_material=RawMaterial.objects.get(name=name)
+    quantity_raw=getattr(raw_material, 'quantity')
+    #print(type(raw_material))
     form=RawMaterialForm(instance=raw_material)
     if request.method == 'POST':
         form=RawMaterialForm(request.POST, instance=raw_material)
         if form.is_valid():
-            form.save()
+            quantity_raw +=form.cleaned_data.get('quantity')
+            raw_material.quantity=quantity_raw
+            raw_material.save()
             return redirect('/view_raw_material')
     return render(request, 'RawMaterial.html', {'update_form':form})
 
@@ -44,6 +48,11 @@ def view_production_stage(request):
     return render(request, 'ProductionStage.html', {'all_products':all_products})
 
 def create_product(request):
+    product=ProductionStage.objects.get(name=name)
+    product_quantity=getattr(product, 'product_quantity')
+    raw_material=RawMaterial.objects.get(name=getattr(product, 'raw_material'))
+    raw_material_quanity=getattr(raw_material, 'quantity') 
+    form=ProductionStageForm(instance=product)
     form=ProductionStageForm()
     if request.method == 'POST':
         form=ProductionStageForm(request.POST)
@@ -54,13 +63,17 @@ def create_product(request):
 
 def update_production_stage(request, name):
     product=ProductionStage.objects.get(name=name)
+    product_quantity=getattr(product, 'product_quantity')
+    raw_material=RawMaterial.objects.get(name=getattr(product, 'raw_material'))
+    raw_material_quanity=getattr(raw_material, 'quantity') 
     form=ProductionStageForm(instance=product)
     if request.method == 'POST':
         form=RawMaterialForm(request.POST, instance=product)
         if form.is_valid():
+
             form.save()
             return redirect('/view_production_stage')
-    return render(request, 'RawMaterial.html', {'update_form':form})
+    return render(request, 'ProductionStage.html', {'update_form':form})
 
 def view_dispatch(request):
     all_products=Dispatch.objects.all()
