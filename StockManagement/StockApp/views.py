@@ -17,7 +17,8 @@ from django.contrib.auth import login
 
 def view_raw_material(request):
     all_raw_material=RawMaterial.objects.all()
-    return render(request, 'RawMaterial.html', {'all_raw_material':all_raw_material})
+    form=RawMaterialForm()
+    return render(request, 'RawMaterial.html', {'all_raw_material':all_raw_material,'create_form':form})
 
 def create_raw_material(request):
     form=RawMaterialForm()
@@ -45,7 +46,8 @@ def update_raw_material(request, name):
 
 def view_production_stage(request):
     all_products=ProductionStage.objects.all()
-    return render(request, 'ProductionStage.html', {'all_products':all_products})
+    form=ProductionStageForm()
+    return render(request, 'ProductionStage.html', {'all_products':all_products,'create_form':form})
 
 def create_product(request):
     product=ProductionStage.objects.get(name=name)
@@ -101,6 +103,8 @@ def update_dispatch(request, name):
 def LoginView(request):
     if request.method == 'POST':
         form=AuthenticationForm(data=request.POST)
+        form.fields['username'].widget.attrs['class']={"form-control form-group",}
+        form.fields['password'].widget.attrs['class']={"form-control form-group"}
         if form.is_valid():
             user=form.get_user()
             login(request, user)

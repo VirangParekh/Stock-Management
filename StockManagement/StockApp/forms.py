@@ -7,6 +7,7 @@ class RawMaterialForm(forms.ModelForm):
     class Meta:
         model=RawMaterial
         fields='__all__'
+        
 
 
 class ProductionStageForm(forms.ModelForm):
