@@ -63,17 +63,19 @@ def create_product(request):
             return redirect('/view_production_stage')
     return render(request, 'ProductionSTage.html', {'create_form':form})
 
-def update_production_stage(request, name):
+def update_production_stage(request, name, ratio):
     product=ProductionStage.objects.get(name=name)
     product_quantity=getattr(product, 'product_quantity')
     raw_material=RawMaterial.objects.get(name=getattr(product, 'raw_material'))
-    raw_material_quanity=getattr(raw_material, 'quantity') 
+    raw_material_quanity=getattr(raw_material, 'quantity')
+    material=RawMaterial(name=getattr(product, 'raw_material'))
     form=ProductionStageForm(instance=product)
     if request.method == 'POST':
         form=RawMaterialForm(request.POST, instance=product)
         if form.is_valid():
-
-            form.save()
+            raw_material_quanity -= ratio*raw_material_quanity
+            material.quantity=raw_material_quanity
+            material.save()
             return redirect('/view_production_stage')
     return render(request, 'ProductionStage.html', {'update_form':form})
 
