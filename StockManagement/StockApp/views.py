@@ -1,119 +1,62 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from .models import RawMaterial, ProductionStage, Dispatch
-from .forms import RawMaterialForm, ProductionStageForm, DispatchForm #LoginForm
-import templates
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
-#from django.shortcuts import redirect
+from django.shortcuts import render
+from .models import *
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+from django.core.paginator import Paginator, Page
+#import templates.virang_templates
 
-# class RawMaterialView(UpdateView):
-#     model=RawMaterial
-#     fields=['quantity']
-#     form_class=RawMaterialForm
-#     template_name='RawMaterial.html'
-
+class RawMaterialDisplayView(ListView):
+    model=RawMaterial
+    context_object_name='view_raw_material'
+    queryset=RawMaterial.objects.all()
+    paginate_by=5
 
 
-def view_raw_material(request):
-    all_raw_material=RawMaterial.objects.all()
-    form=RawMaterialForm()
-    return render(request, 'RawMaterial.html', {'all_raw_material':all_raw_material,'create_form':form})
+    def get_context_data(self,**kwargs):
+        self.context_object_name=super(RawMaterialDisplayView, self).get_context_data(**kwargs)
+        self.context_object_name['number']=self.paginate_by
+        #self.context_object_name['expand']=self.expand_raw_material(name=name)
+        return self.context_object_name
 
-def create_raw_material(request):
-    form=RawMaterialForm()
-    if request.method == 'POST':
-        form=RawMaterialForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/view_raw_material')
-    return render(request, 'RawMaterial.html', {'create_form':form})
+    #template_name='StockApp/rawmaterial_list.html'
 
-def update_raw_material(request, name):
-    raw_material=RawMaterial.objects.get(name=name)
-    quantity_raw=getattr(raw_material, 'quantity')
-    #print(type(raw_material))
-    form=RawMaterialForm(instance=raw_material)
-    if request.method == 'POST':
-        form=RawMaterialForm(request.POST, instance=raw_material)
-        if form.is_valid():
-            quantity_raw +=form.cleaned_data.get('quantity')
-            raw_material.quantity=quantity_raw
-            raw_material.save()
-            return redirect('/view_raw_material')
-    return render(request, 'RawMaterial.html', {'update_form':form})
+class RawMaterialCreateView(CreateView):
+    model=RawMaterial
+    fields='__all__'
+    template_name='StockApp/rawmaterial_create.html'
+    success_url='/view_raw_material'
 
-
-def view_production_stage(request):
-    all_products=ProductionStage.objects.all()
-    form=ProductionStageForm()
-    return render(request, 'ProductionStage.html', {'all_products':all_products,'create_form':form})
-
-def create_product(request):
-    product=ProductionStage.objects.get(name=name)
-    product_quantity=getattr(product, 'product_quantity')
-    raw_material=RawMaterial.objects.get(name=getattr(product, 'raw_material'))
-    raw_material_quanity=getattr(raw_material, 'quantity') 
-    form=ProductionStageForm(instance=product)
-    form=ProductionStageForm()
-    if request.method == 'POST':
-        form=ProductionStageForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/view_production_stage')
-    return render(request, 'ProductionSTage.html', {'create_form':form})
-
-def update_production_stage(request, name, ratio):
-    product=ProductionStage.objects.get(name=name)
-    product_quantity=getattr(product, 'product_quantity')
-    raw_material=RawMaterial.objects.get(name=getattr(product, 'raw_material'))
-    raw_material_quanity=getattr(raw_material, 'quantity')
-    material=RawMaterial(name=getattr(product, 'raw_material'))
-    form=ProductionStageForm(instance=product)
-    if request.method == 'POST':
-        form=RawMaterialForm(request.POST, instance=product)
-        if form.is_valid():
-            raw_material_quanity -= ratio*raw_material_quanity
-            material.quantity=raw_material_quanity
-            material.save()
-            return redirect('/view_production_stage')
-    return render(request, 'ProductionStage.html', {'update_form':form})
-
-def view_dispatch(request):
-    all_products=Dispatch.objects.all()
-    return render(request, 'Dispatch.html', {'all_products':all_products})
-
-def create_dispatch(request):
-    form=DispatchForm()
-    if request.method == 'POST':
-        form=DispatchForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/view_dispatch')
-    return render(request, 'Dispatch.html', {'create_form':form})
-
-def update_dispatch(request, name):
-    product=Dispatch.objects.get(name=name)
-    form=DispatchForm(instance=product)
-    if request.method == 'POST':
-        form=DispatchForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save()
-            return redirect('/view_dispatch')
-    return render(request, 'Dispatch.html', {'update_form':form})
-
-def LoginView(request):
-    if request.method == 'POST':
-        form=AuthenticationForm(data=request.POST)
-        form.fields['username'].widget.attrs['class']={"form-control form-group",}
-        form.fields['password'].widget.attrs['class']={"form-control form-group"}
-        if form.is_valid():
-            user=form.get_user()
-            login(request, user)
-            return redirect('/view_raw_material')
-    else:
-        form=AuthenticationForm()
-
-    return render(request, 'Login.html', {'form':form})
+    def change_rate(self):
+        if self.object is not None:
+            mode=getattr(self.object,'mode')
+            quantity=getattr(self.object,'quantity')
+            if mode=='ltr':
+                density=getattr(self.object,'density')
+                rate=getattr(self.object,'density')
+                rate=rate*density
+                self.object.rate=rate
+                self.object.save()
+            else:
+                pass
 
 
+def expand_raw_material(request,name):
+    raw_material=RawMaterial.objects.filter(name=name)
+    print(type(RawMaterial))
+    expand=[]
+    for i in raw_material:
+        supplier=getattr(i, 'supplier')
+        quantity=getattr(i, 'quantity')
+        date=getattr(i,'date')
+        expand.append([name,supplier,quantity,date])
+    return expand
+
+
+class ExpandRawMaterialView(ListView):
+    model=RawMaterial
+    context_object_name='expand_raw_material'
+    template_name='StockApp/expand_list.html'
+    
+    def get_queryset(self, **kwargs):
+        return self.model.objects.filter(name__icontains=self.kwargs['name'])[:]

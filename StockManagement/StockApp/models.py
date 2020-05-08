@@ -1,6 +1,7 @@
 from django.db import models
 from django.shortcuts import render
 #from django.contrib.auth.models import User
+from datetime import datetime
 
 
 class RawMaterial(models.Model):
@@ -9,13 +10,15 @@ class RawMaterial(models.Model):
         ('ltr','Litres'),
     )
     name=models.CharField(max_length=500, verbose_name='Raw-Material-Name', default=None)
-    date=models.DateField(verbose_name='raw-material_date', auto_now=True)
+    date=models.DateField(verbose_name='raw-material_date')
     raw_cat=models.CharField(max_length=350)
-    raw_sub_cat=models.CharField(max_length=300)
+    #raw_sub_cat=models.CharField(max_length=300)
     quantity=models.FloatField(verbose_name='raw_material_quantity')
     mode=models.CharField(max_length=120, choices=mass_vol)
     density=models.FloatField(verbose_name='raw-material_denisty')
     selected=models.BooleanField(default=False)
+    rate=models.FloatField(verbose_name='raw_material_rate')
+    supplier=models.CharField(verbose_name='supplier_name', max_length=300)
 
     def __str__(self):
         return self.name
@@ -44,7 +47,7 @@ class Dispatch(models.Model):
     dispatch_status=models.BooleanField(default=True)
 
     def __str__(self):
-        return self.bill_no
+        return str(self.bill_no)
 
 
 

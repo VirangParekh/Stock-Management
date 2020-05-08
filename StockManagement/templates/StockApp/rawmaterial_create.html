@@ -1,0 +1,13 @@
+<h1>
+    Create Raw Material
+</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Create Raw Material
+    </button>
+</form>

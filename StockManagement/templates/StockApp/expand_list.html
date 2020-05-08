@@ -1,0 +1,13 @@
+<h1>
+    Expand
+</h1>
+
+<ul>
+    {% csrf_token %}
+
+    {% for i in object_list %}
+        <li>
+            {{ i }}
+        </li>
+    {% endfor %}
+</ul>
