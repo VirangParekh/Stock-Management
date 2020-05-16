@@ -1,0 +1,13 @@
+<h1>
+    Update Dispatch
+</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Update Dispatch
+    </button>
+</form>

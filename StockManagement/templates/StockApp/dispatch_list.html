@@ -1,11 +1,13 @@
-<h1> all raw materials</h1>
+<h1>
+    Dispatch
+</h1>
 
 <ul>
     {% csrf_token %}
-    
+
     {% for i in object_list %}
         <li>
-            {{ i.name }}-{{ i.rate }}
+            {{ i }}
         </li>
     {% endfor %}
 </ul>

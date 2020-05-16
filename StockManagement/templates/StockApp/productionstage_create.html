@@ -1,0 +1,17 @@
+<h1>
+    Create Product
+</h1>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Create New Product
+    </button>
+</form>
+
+<p>
+    {{ rawmaterial }}
+</p>

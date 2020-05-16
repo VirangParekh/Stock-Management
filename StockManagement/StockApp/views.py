@@ -1,57 +1,59 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from .models import *
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.paginator import Paginator, Page
+from .forms import *
+from datetime import date
 #import templates.virang_templates
 
 class RawMaterialDisplayView(ListView):
     model=RawMaterial
     context_object_name='view_raw_material'
     queryset=RawMaterial.objects.all()
-    paginate_by=5
-
-
-    def get_context_data(self,**kwargs):
-        self.context_object_name=super(RawMaterialDisplayView, self).get_context_data(**kwargs)
-        self.context_object_name['number']=self.paginate_by
-        #self.context_object_name['expand']=self.expand_raw_material(name=name)
-        return self.context_object_name
-
-    #template_name='StockApp/rawmaterial_list.html'
+    template_name='StockApp/rawmaterial_list.html'
 
 class RawMaterialCreateView(CreateView):
-    model=RawMaterial
-    fields='__all__'
+    form_class=RawMaterialForm
+    #fields='__all__'
     template_name='StockApp/rawmaterial_create.html'
     success_url='/view_raw_material'
 
-    def change_rate(self):
-        if self.object is not None:
-            mode=getattr(self.object,'mode')
-            quantity=getattr(self.object,'quantity')
-            if mode=='ltr':
-                density=getattr(self.object,'density')
-                rate=getattr(self.object,'density')
-                rate=rate*density
-                self.object.rate=rate
-                self.object.save()
-            else:
-                pass
+    def form_valid(self, form):
+        self.object=form.save(commit=False)
+        if self.object.mode=='ltr':
+            rate=self.object.rate
+            density=self.object.density
+            rate=rate/density
+            self.object.rate=rate
+            self.object.save()
+            return HttpResponseRedirect(self.success_url)
+
+class RawMaterialUpdateView(UpdateView):
+    model=RawMaterial
+    fields=[
+        'quantity',
+        'selected',
+        'date',
+    ]
+    template_name='StockApp/rawmaterial_update.html'
+    success_url='/view_raw_material'
+    #queryset=RawMaterial.objects.all()
+
+    def form_valid(self, form):
+        self.object=form.save(commit=False)
+        if self.object.selected==True:
+            quantity_old=getattr(RawMaterial.objects.get(pk=self.object.pk), 'quantity')
+            quantity_incoming=self.object.quantity
+            quantity_new=quantity_old+quantity_incoming
+            self.object.quantity=quantity_new
+            self.object.save()
+            return HttpResponseRedirect(self.success_url)
 
 
-def expand_raw_material(request,name):
-    raw_material=RawMaterial.objects.filter(name=name)
-    print(type(RawMaterial))
-    expand=[]
-    for i in raw_material:
-        supplier=getattr(i, 'supplier')
-        quantity=getattr(i, 'quantity')
-        date=getattr(i,'date')
-        expand.append([name,supplier,quantity,date])
-    return expand
-
+  
 
 class ExpandRawMaterialView(ListView):
     model=RawMaterial
@@ -60,3 +62,66 @@ class ExpandRawMaterialView(ListView):
     
     def get_queryset(self, **kwargs):
         return self.model.objects.filter(name__icontains=self.kwargs['name'])[:]
+
+
+
+class ProductionStageDisplayView(ListView):
+    model=ProductionStage
+    context_object_name='view_production_stage'
+    queryset=ProductionStage.objects.all()
+    #paginate_by=5
+    template_name='StockApp/productionstage_list.html'
+
+class ProductionStageCreateView(CreateView):
+    model=ProductionStage
+    fields='__all__'
+    template_name='StockApp/productionstage_create.html'
+    success_url='/view_production_stage'
+
+
+class DispatchDisplayView(ListView):
+    model=Dispatch
+    template_name='StockApp/dispatch_list.html'
+    queryset=Dispatch.objects.all()
+
+
+class DispatchCreateView(CreateView):
+    model=Dispatch
+    fields='__all__'
+    template_name='StockApp/dispatch_create.html'
+    success_url='StockApp/dispatch_list.html'
+    #context_object_name='new_dispatch'
+
+    def form_valid(self, form):
+        self.object=form.save(commit=False)
+        self.object.save()
+        return HttpResponseRedirect(self.success_url)
+
+
+class DispatchUpdateView(UpdateView):
+    model=Dispatch
+    fields=[
+        'date_dispatch',
+        'bill_no',
+        'dispatch_status',
+    ]
+    template_name='StockApp/dispatch_update.html'
+    success_url='StockApp/dispatch_list.html'
+
+    def form_valid(self, form):
+        self.object=form.save(commit=False)
+        if self.object.dispatch_status=='True':
+            self.object.save()
+            return HttpResponseRedirect(self.success_url)
+        
+
+
+
+
+
+    
+
+
+
+
+
