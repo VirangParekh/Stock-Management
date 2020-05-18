@@ -1,13 +1,11 @@
 <h1>
-    Create Dispatch
+  Create Dispatch
 </h1>
 
 <form method="POST">
-    {% csrf_token %}
+  {% csrf_token %} {{ form.as_p }}
 
-    {{ form.as_p }}
-
-    <button type="submit">
-        Create Dispatch
-    </button>
+  <button type="submit">
+    Create Dispatch
+  </button>
 </form>
