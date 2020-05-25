@@ -12,4 +12,5 @@ urlpatterns = [
     path('view_dispatch',DispatchDisplayView.as_view(),name='view_dispatch'),
     path('create_dispatch',DispatchCreateView.as_view(),name='create_dispatch'),
     path('update_dispatch',DispatchUpdateView.as_view(),name='update_dispatch'),
+    path('',LoginView.as_view(),name='login'),
 ]
