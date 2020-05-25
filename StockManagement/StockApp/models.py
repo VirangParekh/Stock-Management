@@ -37,6 +37,13 @@ class ProductionStage(models.Model):
     raw_materials=models.ManyToManyField(RawMaterial)
     name=models.CharField(max_length=350, verbose_name='product name')
     quantity_prod=models.FloatField(verbose_name='ProdutionQuantity')
+    quantity1=models.FloatField(verbose_name='Quantity 1')
+    quantity2=models.FloatField(verbose_name='Quantity 2')
+    quantity3=models.FloatField(verbose_name='Quantity 3')
+    quantity4=models.FloatField(verbose_name='Quantity 4')
+    quantity5=models.FloatField(verbose_name='Quantity 5')
+    quantity6=models.FloatField(verbose_name='Quantity 6')
+    quantity7=models.FloatField(verbose_name='Quantity 7')
     selected=models.BooleanField(default=False)
 
     class Meta:
@@ -52,6 +59,13 @@ class Dispatch(models.Model):
     date_dispatch=models.DateField(verbose_name='date_of_dispatch')
     products=models.ManyToManyField(to=ProductionStage)
     bill_no=models.IntegerField(verbose_name='bill_number')
+    quantity1=models.FloatField(verbose_name='Quantity 1')
+    quantity2=models.FloatField(verbose_name='Quantity 2')
+    quantity3=models.FloatField(verbose_name='Quantity 3')
+    quantity4=models.FloatField(verbose_name='Quantity 4')
+    quantity5=models.FloatField(verbose_name='Quantity 5')
+    quantity6=models.FloatField(verbose_name='Quantity 6')
+    quantity7=models.FloatField(verbose_name='Quantity 7')
     dispatch_status=models.BooleanField(verbose_name='dispatch_status', default=True)
 
 

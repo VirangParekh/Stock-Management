@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from .models import *
+from django.views.generic import FormView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.paginator import Paginator, Page
 from .forms import *
 from datetime import date
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 #import templates.virang_templates
 
 
@@ -84,13 +86,24 @@ class ProductionStageCreateView(CreateView):
         self.object=form.save(commit=False)
         self.object.save()
         cores_raw_materials=ProductionStage.objects.values_list('id','raw_materials')
+        prod_quantity_list=[
+            self.object.quantity1,
+            self.object.quantity2,
+            self.object.quantity3,
+            self.object.quantity4,
+            self.object.quantity5,
+            self.object.quantity6,
+            self.object.quantity7,
+        ]
+        count_index=0
         for i in cores_raw_materials:
             if self.object.pk == i[0]:
-                product=RawMaterial.objects.filter(id=i[1])
-                quantity=getattr(product, 'quantity')
-                quantity -=10
-                product.quantity=quantity
-                product.save()
+                raw_material=RawMaterial.objects.filter(id=i[1])
+                quantity=getattr(raw_material, 'quantity')
+                quantity -= prod_quantity_list[count_index]
+                count_index +=1
+                raw_material.quantity=quantity
+                raw_material.save()
         return HttpResponseRedirect(self.success_url)
 
 
@@ -115,15 +128,26 @@ class DispatchCreateView(CreateView):
     #context_object_name='new_dispatch'
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
+        self.object=form.save(commit=False)
         self.object.save()
-        cores_products=Dispatch.objects.values_list('id','products')
+        cores_products=Dispatch.objects.values_list('id','raw_materials')
+        prod_quantity_list=[
+            self.object.quantity1,
+            self.object.quantity2,
+            self.object.quantity3,
+            self.object.quantity4,
+            self.object.quantity5,
+            self.object.quantity6,
+            self.object.quantity7,
+        ]
+        count_index=0
         for i in cores_products:
             if self.object.pk == i[0]:
                 product=ProductionStage.objects.filter(id=i[1])
-                quantity=getattr(product, 'quantity_prod')
-                quantity -=10
-                product.quantity_prod=quantity
+                quantity=getattr(product, 'quantity')
+                quantity -= prod_quantity_list[count_index]
+                count_index +=1
+                product.quantity=quantity
                 product.save()
         return HttpResponseRedirect(self.success_url)
 
@@ -143,3 +167,9 @@ class DispatchUpdateView(UpdateView):
         if self.object.dispatch_status == 'True':
             self.object.save()
             return HttpResponseRedirect(self.success_url)
+
+
+class LoginView(FormView):
+    form_class=AuthenticationForm
+    template_name='StockApp/login.html'
+    success_url='/view_raw_material'    
