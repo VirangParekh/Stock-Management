@@ -62,17 +62,15 @@
                             <tbody>
                                 {% csrf_token %}
                                 {% for i in object_list %}    
-                                {% if i.name == "P-111"%}                   
+                                {% if i.raw_cat == "PASTE"%}                   
                                 <tr>                                
                                     <td>{{i.selected}}</td>
                                     <td>{{i.date}}</td>
                                     <td>{{i.name}}</td>
                                     <td>{{i.mode}}</td>
-                                    <td>{{i.quantity}}</td>    
-                                    <td>{% csrf_token %}
-                                        <input type="number" name="new_quantity"></td>                            
+                                    <td>{{i.quantity}}</td>                                
                                     <td>
-                                    <button type="submit" class="btn btn-primary" formaction="/update_raw_material/{{i.id}}" formmethod="POST">
+                                    <button type="submit" class="btn btn-primary" formaction="/update_raw_material/{{i.id}}">
                                         Update
                                     </button> 
                                     </td>
