@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import *
 from django.views.generic import FormView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -36,27 +36,15 @@ class RawMaterialCreateView(CreateView):
             return HttpResponseRedirect(self.success_url)
 
 
-class RawMaterialUpdateView(UpdateView):
-    model = RawMaterial
-    fields = [
-        'quantity',
-        'selected',
-        'date',
-    ]
-    template_name = 'StockApp/rawmaterial_update.html'
-    success_url = '/view_raw_material'
-    # queryset=RawMaterial.objects.all()
+def RawMaterialUpdateView(request, sr):
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        if self.object.selected == True:
-            quantity_old = getattr(RawMaterial.objects.get(
-                pk=self.object.pk), 'quantity')
-            quantity_incoming = self.object.quantity
-            quantity_new = quantity_old+quantity_incoming
-            self.object.quantity = quantity_new
-            self.object.save()
-            return HttpResponseRedirect(self.success_url)
+    if request.method == "POST":
+        quantity_incoming = int(request.POST["new_quantity"])
+        quantity_old = getattr(RawMaterial.objects.get(
+            pk=int(sr)), 'quantity')
+        quantity_new = quantity_old+quantity_incoming
+        RawMaterial.objects.filter(pk=int(sr)).update(quantity=quantity_new)
+        return HttpResponseRedirect('/view_raw_material')
 
 
 class ExpandRawMaterialView(ListView):
@@ -83,10 +71,11 @@ class ProductionStageCreateView(CreateView):
     success_url = '/view_production_stage'
 
     def form_valid(self, form):
-        self.object=form.save(commit=False)
+        self.object = form.save(commit=False)
         self.object.save()
-        cores_raw_materials=ProductionStage.objects.values_list('id','raw_materials')
-        prod_quantity_list=[
+        cores_raw_materials = ProductionStage.objects.values_list(
+            'id', 'raw_materials')
+        prod_quantity_list = [
             self.object.quantity1,
             self.object.quantity2,
             self.object.quantity3,
@@ -95,23 +84,23 @@ class ProductionStageCreateView(CreateView):
             self.object.quantity6,
             self.object.quantity7,
         ]
-        count_index=0
+        count_index = 0
         for i in cores_raw_materials:
             if self.object.pk == i[0]:
-                raw_material=RawMaterial.objects.filter(id=i[1])
-                quantity=getattr(raw_material, 'quantity')
+                raw_material = RawMaterial.objects.filter(id=i[1])
+                quantity = getattr(raw_material, 'quantity')
                 quantity -= prod_quantity_list[count_index]
-                count_index +=1
-                raw_material.quantity=quantity
+                count_index += 1
+                raw_material.quantity = quantity
                 raw_material.save()
         return HttpResponseRedirect(self.success_url)
 
 
 class ProductionStageUpdateView(UpdateView):
-    model=ProductionStage
-    fields='__all__'
-    template_name='StockApp/productionstage_update.html'
-    success_url='/update_production_stage'
+    model = ProductionStage
+    fields = '__all__'
+    template_name = 'StockApp/productionstage_update.html'
+    success_url = '/update_production_stage'
 
 
 class DispatchDisplayView(ListView):
@@ -121,17 +110,17 @@ class DispatchDisplayView(ListView):
 
 
 class DispatchCreateView(CreateView):
-    model=Dispatch
-    fields='__all__'
-    template_name='StockApp/dispatch_create.html'
-    success_url='/view_dispatch'
-    #context_object_name='new_dispatch'
+    model = Dispatch
+    fields = '__all__'
+    template_name = 'StockApp/dispatch_create.html'
+    success_url = '/view_dispatch'
+    # context_object_name='new_dispatch'
 
     def form_valid(self, form):
-        self.object=form.save(commit=False)
+        self.object = form.save(commit=False)
         self.object.save()
-        cores_products=Dispatch.objects.values_list('id','raw_materials')
-        prod_quantity_list=[
+        cores_products = Dispatch.objects.values_list('id', 'raw_materials')
+        prod_quantity_list = [
             self.object.quantity1,
             self.object.quantity2,
             self.object.quantity3,
@@ -140,14 +129,14 @@ class DispatchCreateView(CreateView):
             self.object.quantity6,
             self.object.quantity7,
         ]
-        count_index=0
+        count_index = 0
         for i in cores_products:
             if self.object.pk == i[0]:
-                product=ProductionStage.objects.filter(id=i[1])
-                quantity=getattr(product, 'quantity')
+                product = ProductionStage.objects.filter(id=i[1])
+                quantity = getattr(product, 'quantity')
                 quantity -= prod_quantity_list[count_index]
-                count_index +=1
-                product.quantity=quantity
+                count_index += 1
+                product.quantity = quantity
                 product.save()
         return HttpResponseRedirect(self.success_url)
 
@@ -170,6 +159,6 @@ class DispatchUpdateView(UpdateView):
 
 
 class LoginView(FormView):
-    form_class=AuthenticationForm
-    template_name='StockApp/login.html'
-    success_url='/view_raw_material'    
+    form_class = AuthenticationForm
+    template_name = 'StockApp/login.html'
+    success_url = '/view_raw_material'
