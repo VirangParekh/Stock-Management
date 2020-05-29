@@ -130,7 +130,7 @@ class DispatchCreateView(CreateView):
     def form_valid(self, form):
         self.object=form.save(commit=False)
         self.object.save()
-        cores_products=Dispatch.objects.values_list('id','raw_materials')
+        cores_products=Dispatch.objects.values_list('id','products')
         prod_quantity_list=[
             self.object.quantity1,
             self.object.quantity2,
