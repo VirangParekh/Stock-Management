@@ -99,10 +99,10 @@ class ProductionStageCreateView(CreateView):
         for i in cores_raw_materials:
             if self.object.pk == i[0]:
                 raw_material=RawMaterial.objects.filter(id=i[1])
-                quantity=getattr(raw_material, 'quantity')
-                quantity -= prod_quantity_list[count_index]
+                quantity_rm=raw_material[quantity]
+                quantity_rm -= prod_quantity_list[count_index]
                 count_index +=1
-                raw_material.quantity=quantity
+                raw_material.quantity=quantity_rm
                 raw_material.save()
         return HttpResponseRedirect(self.success_url)
 
@@ -144,10 +144,10 @@ class DispatchCreateView(CreateView):
         for i in cores_products:
             if self.object.pk == i[0]:
                 product=ProductionStage.objects.filter(id=i[1])
-                quantity=getattr(product, 'quantity')
-                quantity -= prod_quantity_list[count_index]
+                quantity_prod=product[quantity]
+                quantity_prod -= prod_quantity_list[count_index]
                 count_index +=1
-                product.quantity=quantity
+                product.quantity=quantity_prod
                 product.save()
         return HttpResponseRedirect(self.success_url)
 
